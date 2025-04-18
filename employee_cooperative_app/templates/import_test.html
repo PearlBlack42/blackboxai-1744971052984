@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Import Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">Import Test</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">File:</label>
+                <input type="file" name="database_file">
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
