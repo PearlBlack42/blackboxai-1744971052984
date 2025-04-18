@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Perhitungan SHU{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">PERHITUNGAN SHU</h1>
+        <div class="flex gap-2">
+            <button onclick="generateSHU()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                <i class="fas fa-sync-alt mr-2"></i>Generate SHU
+            </button>
+            <button onclick="daftarSHU()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                Daftar SHU
+            </button>
+            <button onclick="daftarSHUPembulatan()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">
+                Daftar SHU (Pembulatan)
+            </button>
+            <button onclick="slipSHU()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md">
+                Slip SHU
+            </button>
+        </div>
+    </div>
+
+    <!-- Period Selection -->
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Periode:</label>
+        <select id="periode" class="w-64 border border-gray-300 rounded-md px-3 py-2">
+            {% for period in periods %}
+            <option value="{{ period.kode }}">{{ period.nama }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="grid grid-cols-3 gap-8 mb-6">
+        <!-- Left Column -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Laba Pinjaman</label>
+                <input type="text" id="labaPinjaman" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Laba Lainnya</label>
+                <input type="text" id="labaLainnya" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total Laba</label>
+                <input type="text" id="totalLaba" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total SHU Pengurus</label>
+                <input type="text" id="totalSHUPengurus" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total SHU Simpanan</label>
+                <input type="text" id="totalSHUSimpanan" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total SHU Pinjaman</label>
+                <input type="text" id="totalSHUPinjaman" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Dana Sosial</label>
+                <input type="text" id="danaSosial" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Laba Ditahan</label>
+                <input type="text" id="labaDitahan" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 font-mono">
+            </div>
+        </div>
+    </div>
+
+    <!-- SHU Table -->
+    <div class="overflow-x-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bagian</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Saldo Simpanan</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Bunga</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">SHU Simpanan</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">SHU Pinjaman</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total SHU</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="shuTable">
+                {% for shu in shus %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ shu.nik }}</td>
+                    <td class="px-4 py-2">{{ shu.nama }}</td>
+                    <td class="px-4 py-2">{{ shu.bagian }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(shu.saldo_simpanan) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(shu.total_bunga) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(shu.shu_simpanan) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(shu.shu_pinjaman) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(shu.total_shu) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Record Navigation -->
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium">Record:</span>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+            <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+            <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generateSHU() {
+    // Implement generate SHU functionality
+}
+
+function daftarSHU() {
+    // Implement daftar SHU functionality
+}
+
+function daftarSHUPembulatan() {
+    // Implement daftar SHU pembulatan functionality
+}
+
+function slipSHU() {
+    // Implement slip SHU functionality
+}
+
+// Add event listener for period change
+document.getElementById('periode').addEventListener('change', async function() {
+    try {
+        const response = await fetch(`/api/shu/${this.value}`);
+        const data = await response.json();
+        
+        // Update summary fields
+        document.getElementById('labaPinjaman').value = formatCurrency(data.laba_pinjaman);
+        document.getElementById('labaLainnya').value = formatCurrency(data.laba_lainnya);
+        document.getElementById('totalLaba').value = formatCurrency(data.total_laba);
+        document.getElementById('totalSHUPengurus').value = formatCurrency(data.total_shu_pengurus);
+        document.getElementById('totalSHUSimpanan').value = formatCurrency(data.total_shu_simpanan);
+        document.getElementById('totalSHUPinjaman').value = formatCurrency(data.total_shu_pinjaman);
+        document.getElementById('danaSosial').value = formatCurrency(data.dana_sosial);
+        document.getElementById('labaDitahan').value = formatCurrency(data.laba_ditahan);
+
+        // Update table
+        document.getElementById('shuTable').innerHTML = data.shus.map(shu => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2">${shu.nik}</td>
+                <td class="px-4 py-2">${shu.nama}</td>
+                <td class="px-4 py-2">${shu.bagian}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(shu.saldo_simpanan)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(shu.total_bunga)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(shu.shu_simpanan)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(shu.shu_pinjaman)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(shu.total_shu)}</td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+function formatCurrency(amount) {
+    return `Rp ${amount.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+}
+</script>
+{% endblock %}
