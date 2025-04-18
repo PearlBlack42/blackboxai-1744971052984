@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Tagihan Angsuran{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">TAGIHAN ANGSURAN</h1>
+        <div class="flex gap-2">
+            <button onclick="generateTagihan()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                <i class="fas fa-sync-alt mr-2"></i>Generate Tagihan
+            </button>
+            <button onclick="editTagihan()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md">
+                <i class="fas fa-edit mr-2"></i>Edit Tagihan
+            </button>
+            <button onclick="cetakTagihan1()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                Cetak Tagihan1
+            </button>
+            <button onclick="cetakTagihan2()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">
+                Cetak Tagihan2
+            </button>
+            <button onclick="tagSimPinj()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+                Tag. Simp. Pinj.
+            </button>
+            <button onclick="tagSimPinjKhusus()" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-md">
+                Tag. Simp. Pinj. Khusus
+            </button>
+            <button onclick="prosesTagihan()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">
+                Proses Tagihan
+            </button>
+            <button onclick="exportData()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
+                Export
+            </button>
+            <button onclick="cetakData()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md">
+                Cetak
+            </button>
+        </div>
+    </div>
+
+    <!-- Period Selection -->
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+        <select id="periode" class="w-64 border border-gray-300 rounded-md px-3 py-2">
+            {% for period in periods %}
+            <option value="{{ period.kode }}">{{ period.nama }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Bills Table -->
+    <div class="overflow-x-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bagian</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode Pinj.</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Jumlah Pinjaman</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">N</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sisa Ang. Pok.</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ang. Pokok</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bunga</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="billsTable">
+                {% for bill in bills %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ bill.bagian }}</td>
+                    <td class="px-4 py-2">{{ bill.nama }}</td>
+                    <td class="px-4 py-2">{{ bill.periode_pinjaman }}</td>
+                    <td class="px-4 py-2">{{ bill.nik }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(bill.jumlah_pinjaman) }}</td>
+                    <td class="px-4 py-2 text-center">{{ bill.n }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(bill.sisa_angsuran_pokok) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(bill.angsuran_pokok) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(bill.bunga) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium">Record:</span>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+            <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+            <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+        </div>
+        <div class="grid grid-cols-3 gap-8">
+            <div class="text-right">
+                <span class="font-medium">Total Ang. Pok:</span>
+                <span class="font-mono ml-2">Rp {{ "{:,.2f}".format(total_angsuran_pokok) }}</span>
+            </div>
+            <div class="text-right">
+                <span class="font-medium">Total Bunga:</span>
+                <span class="font-mono ml-2">Rp {{ "{:,.2f}".format(total_bunga) }}</span>
+            </div>
+            <div class="text-right">
+                <span class="font-medium">Total Angsuran:</span>
+                <span class="font-mono ml-2">Rp {{ "{:,.2f}".format(total_angsuran) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generateTagihan() {
+    // Implement generate tagihan functionality
+}
+
+function editTagihan() {
+    // Implement edit tagihan functionality
+}
+
+function cetakTagihan1() {
+    // Implement cetak tagihan1 functionality
+}
+
+function cetakTagihan2() {
+    // Implement cetak tagihan2 functionality
+}
+
+function tagSimPinj() {
+    // Implement tag. simp. pinj. functionality
+}
+
+function tagSimPinjKhusus() {
+    // Implement tag. simp. pinj. khusus functionality
+}
+
+function prosesTagihan() {
+    // Implement proses tagihan functionality
+}
+
+function exportData() {
+    // Implement export functionality
+}
+
+function cetakData() {
+    // Implement cetak functionality
+}
+
+// Add event listener for period change
+document.getElementById('periode').addEventListener('change', async function() {
+    try {
+        const response = await fetch(`/api/bills/${this.value}`);
+        const data = await response.json();
+        
+        // Update table
+        document.getElementById('billsTable').innerHTML = data.bills.map(bill => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2">${bill.bagian}</td>
+                <td class="px-4 py-2">${bill.nama}</td>
+                <td class="px-4 py-2">${bill.periode_pinjaman}</td>
+                <td class="px-4 py-2">${bill.nik}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(bill.jumlah_pinjaman)}</td>
+                <td class="px-4 py-2 text-center">${bill.n}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(bill.sisa_angsuran_pokok)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(bill.angsuran_pokok)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(bill.bunga)}</td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+function formatCurrency(amount) {
+    return `Rp ${amount.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+}
+</script>
+{% endblock %}
