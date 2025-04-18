@@ -54,6 +54,18 @@ def jenis_simpanan():
         flash(f'Error loading data: {str(e)}', 'error')
         return redirect(url_for('index'))
 
+@app.route('/jenis-pinjaman')
+def jenis_pinjaman():
+    try:
+        loan_types = JenisPinjaman.query.order_by(JenisPinjaman.kode).all()
+        return render_template('jenis_pinjaman.html',
+            loan_types=loan_types,
+            today=datetime.now().strftime('%Y-%m-%d')
+        )
+    except Exception as e:
+        flash(f'Error loading data: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
 @app.route('/api/savings-types', methods=['GET'])
 def get_savings_types():
     """Get list of savings types"""
@@ -681,6 +693,15 @@ def delete_employee(id):
         return jsonify({'message': str(e)}), 400
 
 if __name__ == '__main__':
+    import sys
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=8000)
+        if len(sys.argv) > 1 and sys.argv[1] == 'import-data':
+            from employee_cooperative_app.utils.db_importer import import_data
+            success = import_data()
+            if success:
+                print("Data import completed successfully.")
+            else:
+                print("Data import failed.")
+        else:
+            app.run(debug=True, port=8000)
