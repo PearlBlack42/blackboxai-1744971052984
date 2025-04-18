@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Angsuran Pinjaman{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">ANGSURAN PINJAMAN</h1>
+        <div class="flex gap-2">
+            <button onclick="openLaporan()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                <i class="fas fa-file-alt mr-2"></i>Laporan
+            </button>
+        </div>
+    </div>
+
+    <!-- Period Selection -->
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+        <select id="periode" class="w-64 border border-gray-300 rounded-md px-3 py-2">
+            {% for period in periods %}
+            <option value="{{ period.kode }}">{{ period.nama }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Installments Table -->
+    <div class="overflow-x-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode Pinjaman</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bagian</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ang. Ke</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ang. Pokok</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bunga</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Jumlah Angsuran</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="installmentsTable">
+                {% for inst in installments %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ inst.periode_pinjaman }}</td>
+                    <td class="px-4 py-2">{{ inst.nik }}</td>
+                    <td class="px-4 py-2">{{ inst.nama }}</td>
+                    <td class="px-4 py-2">{{ inst.bagian }}</td>
+                    <td class="px-4 py-2 text-center">{{ inst.angsuran_ke }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(inst.angsuran_pokok) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(inst.bunga) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.2f}".format(inst.jumlah_angsuran) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium">Record:</span>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+            <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+            <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+        </div>
+        <div class="grid grid-cols-3 gap-8">
+            <div class="text-right">
+                <span class="font-medium">Total Ang. Pok:</span>
+                <span class="font-mono ml-2" id="totalAngsuranPokok">Rp {{ "{:,.2f}".format(total_angsuran_pokok) }}</span>
+            </div>
+            <div class="text-right">
+                <span class="font-medium">Total Bunga:</span>
+                <span class="font-mono ml-2" id="totalBunga">Rp {{ "{:,.2f}".format(total_bunga) }}</span>
+            </div>
+            <div class="text-right">
+                <span class="font-medium">Total Angsuran:</span>
+                <span class="font-mono ml-2" id="totalAngsuran">Rp {{ "{:,.2f}".format(total_angsuran) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openLaporan() {
+    // Implement laporan functionality
+}
+
+// Add event listener for period change
+document.getElementById('periode').addEventListener('change', async function() {
+    try {
+        const response = await fetch(`/api/installments/${this.value}`);
+        const data = await response.json();
+        
+        // Update table
+        document.getElementById('installmentsTable').innerHTML = data.installments.map(inst => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2">${inst.periode_pinjaman}</td>
+                <td class="px-4 py-2">${inst.nik}</td>
+                <td class="px-4 py-2">${inst.nama}</td>
+                <td class="px-4 py-2">${inst.bagian}</td>
+                <td class="px-4 py-2 text-center">${inst.angsuran_ke}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(inst.angsuran_pokok)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(inst.bunga)}</td>
+                <td class="px-4 py-2 text-right font-mono">${formatCurrency(inst.jumlah_angsuran)}</td>
+            </tr>
+        `).join('');
+
+        // Update totals
+        document.getElementById('totalAngsuranPokok').textContent = formatCurrency(data.total_angsuran_pokok);
+        document.getElementById('totalBunga').textContent = formatCurrency(data.total_bunga);
+        document.getElementById('totalAngsuran').textContent = formatCurrency(data.total_angsuran);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+function formatCurrency(amount) {
+    return `Rp ${amount.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+}
+</script>
+{% endblock %}
