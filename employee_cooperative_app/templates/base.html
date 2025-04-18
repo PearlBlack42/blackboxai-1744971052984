@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Koperasi Karyawan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_new.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{{ url_for('index') }}" class="text-white text-xl font-bold">
+                            Koperasi Karyawan
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-4 items-center">
+                        <a href="{{ url_for('master_karyawan') }}" class="nav-link {% if request.endpoint == 'master_karyawan' %}active{% endif %}">
+                            <i class="fas fa-users mr-2"></i>Karyawan
+                        </a>
+                        <a href="{{ url_for('simpanan') }}" class="nav-link {% if request.endpoint == 'simpanan' %}active{% endif %}">
+                            <i class="fas fa-piggy-bank mr-2"></i>Simpanan
+                        </a>
+                        <a href="{{ url_for('pinjaman') }}" class="nav-link {% if request.endpoint == 'pinjaman' %}active{% endif %}">
+                            <i class="fas fa-hand-holding-usd mr-2"></i>Pinjaman
+                        </a>
+                        <a href="{{ url_for('angsuran') }}" class="nav-link {% if request.endpoint == 'angsuran' %}active{% endif %}">
+                            <i class="fas fa-money-bill-wave mr-2"></i>Angsuran
+                        </a>
+                        <a href="{{ url_for('master_barang') }}" class="nav-link {% if request.endpoint == 'master_barang' %}active{% endif %}">
+                            <i class="fas fa-box mr-2"></i>Barang
+                        </a>
+                        <a href="{{ url_for('periode') }}" class="nav-link {% if request.endpoint == 'periode' %}active{% endif %}">
+                            <i class="fas fa-calendar-alt mr-2"></i>Periode
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{{ url_for('master_karyawan') }}" class="nav-link block {% if request.endpoint == 'master_karyawan' %}active{% endif %}">
+                    <i class="fas fa-users mr-2"></i>Karyawan
+                </a>
+                <a href="{{ url_for('simpanan') }}" class="nav-link block {% if request.endpoint == 'simpanan' %}active{% endif %}">
+                    <i class="fas fa-piggy-bank mr-2"></i>Simpanan
+                </a>
+                <a href="{{ url_for('pinjaman') }}" class="nav-link block {% if request.endpoint == 'pinjaman' %}active{% endif %}">
+                    <i class="fas fa-hand-holding-usd mr-2"></i>Pinjaman
+                </a>
+                <a href="{{ url_for('angsuran') }}" class="nav-link block {% if request.endpoint == 'angsuran' %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave mr-2"></i>Angsuran
+                </a>
+                <a href="{{ url_for('master_barang') }}" class="nav-link block {% if request.endpoint == 'master_barang' %}active{% endif %}">
+                    <i class="fas fa-box mr-2"></i>Barang
+                </a>
+                <a href="{{ url_for('periode') }}" class="nav-link block {% if request.endpoint == 'periode' %}active{% endif %}">
+                    <i class="fas fa-calendar-alt mr-2"></i>Periode
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow mt-8">
+        <div class="max-w-7xl mx-auto py-4 px-4">
+            <p class="text-center text-gray-500 text-sm">
+                &copy; {{ now.year }} Koperasi Karyawan. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
+            document.querySelector('.mobile-menu').classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
