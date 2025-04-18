@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Form Jenis Pinjaman{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">Form Jenis Pinjaman</h1>
+    <div class="flex gap-2 mb-4">
+        <button id="btnAdd" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Tambah</button>
+        <button id="btnEdit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Edit</button>
+        <button id="btnDelete" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Hapus</button>
+        <button id="btnSave" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Simpan</button>
+    </div>
+    <form id="loanTypeForm" class="mb-6 grid grid-cols-3 gap-4">
+        <div>
+            <label for="kode" class="block font-semibold mb-1">Kode</label>
+            <input type="text" id="kode" name="kode" class="w-full border border-gray-300 rounded px-3 py-2" required>
+        </div>
+        <div>
+            <label for="nama" class="block font-semibold mb-1">Nama</label>
+            <input type="text" id="nama" name="nama" class="w-full border border-gray-300 rounded px-3 py-2" required>
+        </div>
+        <div>
+            <label for="keterangan" class="block font-semibold mb-1">Keterangan</label>
+            <input type="text" id="keterangan" name="keterangan" class="w-full border border-gray-300 rounded px-3 py-2">
+        </div>
+    </form>
+    <table class="min-w-full border border-gray-300 rounded">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="border border-gray-300 px-4 py-2">Kode</th>
+                <th class="border border-gray-300 px-4 py-2">Nama</th>
+                <th class="border border-gray-300 px-4 py-2">Keterangan</th>
+            </tr>
+        </thead>
+        <tbody id="loanTypeTableBody">
+            {% for loan_type in loan_types %}
+            <tr data-kode="{{ loan_type.kode }}" class="cursor-pointer hover:bg-gray-200">
+                <td class="border border-gray-300 px-4 py-2">{{ loan_type.kode }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ loan_type.nama }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ loan_type.keterangan }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('loanTypeForm');
+    const tableBody = document.getElementById('loanTypeTableBody');
+    let selectedKode = null;
+
+    // Select row
+    tableBody.addEventListener('click', (e) => {
+        const tr = e.target.closest('tr');
+        if (!tr) return;
+        selectedKode = tr.dataset.kode;
+        // Highlight selected row
+        [...tableBody.children].forEach(row => row.classList.remove('bg-blue-200'));
+        tr.classList.add('bg-blue-200');
+        // Fill form
+        document.getElementById('kode').value = tr.children[0].textContent;
+        document.getElementById('nama').value = tr.children[1].textContent;
+        document.getElementById('keterangan').value = tr.children[2].textContent;
+    });
+
+    // Add new
+    document.getElementById('btnAdd').addEventListener('click', () => {
+        selectedKode = null;
+        form.reset();
+        document.getElementById('kode').focus();
+    });
+
+    // Edit (just focus form)
+    document.getElementById('btnEdit').addEventListener('click', () => {
+        if (!selectedKode) {
+            alert('Pilih data untuk diedit');
+            return;
+        }
+        document.getElementById('kode').focus();
+    });
+
+    // Delete
+    document.getElementById('btnDelete').addEventListener('click', async () => {
+        if (!selectedKode) {
+            alert('Pilih data untuk dihapus');
+            return;
+        }
+        if (!confirm('Yakin ingin menghapus data ini?')) return;
+        try {
+            const response = await fetch(`/api/loan-types/${selectedKode}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Gagal menghapus data');
+            alert('Data berhasil dihapus');
+            location.reload();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // Save (add or update)
+    document.getElementById('btnSave').addEventListener('click', async () => {
+        const kode = document.getElementById('kode').value.trim();
+        const nama = document.getElementById('nama').value.trim();
+        const keterangan = document.getElementById('keterangan').value.trim();
+
+        if (!kode || !nama) {
+            alert('Kode dan Nama wajib diisi');
+            return;
+        }
+
+        try {
+            let response;
+            if (selectedKode && selectedKode === kode) {
+                // Update
+                response = await fetch(`/api/loan-types/${kode}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nama, keterangan })
+                });
+            } else {
+                // Add
+                response = await fetch('/api/loan-types', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kode, nama, keterangan })
+                });
+            }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal menyimpan data');
+            }
+            alert('Data berhasil disimpan');
+            location.reload();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+});
+</script>
+{% endblock %}
