@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from employee_cooperative_app.utils.db_importer import import_data, sync_data
+from employee_cooperative_app.utils.database import MasterKaryawan
 
 import_bp = Blueprint('import', __name__)
 
@@ -49,3 +50,27 @@ def sync_database():
             'status': 'error',
             'message': f'Error during synchronization: {str(e)}'
         }), 500
+
+@import_bp.route('/api/employees/<nik>', methods=['GET'])
+def get_employee(nik):
+    try:
+        emp = MasterKaryawan.query.filter_by(NIK=nik).first()
+        if not emp:
+            return jsonify({'error': 'Employee not found'}), 404
+        return jsonify({
+            'nik': emp.NIK,
+            'nama': emp.Nama,
+            'bagian': emp.Bagian,
+            'jabatan': emp.Jabatan,
+            'jk': emp.JK,
+            'khusus': emp.IDKhusus == 'Y' if emp.IDKhusus else False,
+            'tmk': emp.TMKBaru.strftime('%Y-%m-%d') if emp.TMKBaru else '',
+            'iuran_wajib': emp.IuranWajib,
+            'tgl_keluar': emp.TglKeluar.strftime('%Y-%m-%d') if emp.TglKeluar else '',
+            'baru': False,  # Adjust as needed
+            'status': emp.Status == 1,
+            'max_plafon': emp.MaxPlafon,
+            'max_plafon_sembako': emp.MaxPlafonSembako
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
