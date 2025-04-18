@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Laporan{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6 max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Print Report</h1>
+
+    <form id="reportForm" class="space-y-6">
+        <div class="bg-blue-50 p-6 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">Laporan</h2>
+
+            <div class="space-y-4">
+                <!-- Period Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Perbulan</label>
+                    <select name="periode" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="">Pilih Periode...</option>
+                        {% for period in periods %}
+                        <option value="{{ period.periode_id }}">{{ period.periode }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Payment Type -->
+                <div class="space-y-2">
+                    <div class="flex items-center">
+                        <input type="radio" id="cash" name="payment_type" value="cash" class="h-4 w-4 text-blue-600">
+                        <label for="cash" class="ml-2 text-sm text-gray-700">Cash</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="credit" name="payment_type" value="credit" class="h-4 w-4 text-blue-600" checked>
+                        <label for="credit" class="ml-2 text-sm text-gray-700">Kredit</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-4">
+            <button type="button" id="printBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                Print
+            </button>
+            <button type="button" id="exportBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                Export
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Print Preview Modal -->
+<div id="printPreview" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Print Preview</h2>
+            <button id="closePreview" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="previewContent" class="space-y-4">
+            <!-- Preview content will be inserted here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reportForm');
+    const printBtn = document.getElementById('printBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const printPreview = document.getElementById('printPreview');
+    const closePreview = document.getElementById('closePreview');
+    const previewContent = document.getElementById('previewContent');
+
+    // Handle print button click
+    printBtn?.addEventListener('click', async function() {
+        const periode = form.querySelector('select[name="periode"]').value;
+        const paymentType = form.querySelector('input[name="payment_type"]:checked').value;
+
+        if (!periode) {
+            alert('Pilih periode terlebih dahulu');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/reports/preview?periode=${periode}&payment_type=${paymentType}`);
+            if (!response.ok) {
+                throw new Error('Failed to generate report');
+            }
+
+            const data = await response.json();
+            
+            // Display preview
+            previewContent.innerHTML = data.html;
+            printPreview.classList.remove('hidden');
+
+            // Auto print after preview
+            window.print();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Gagal membuat laporan');
+        }
+    });
+
+    // Handle export button click
+    exportBtn?.addEventListener('click', async function() {
+        const periode = form.querySelector('select[name="periode"]').value;
+        const paymentType = form.querySelector('input[name="payment_type"]:checked').value;
+
+        if (!periode) {
+            alert('Pilih periode terlebih dahulu');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/reports/export?periode=${periode}&payment_type=${paymentType}`);
+            if (!response.ok) {
+                throw new Error('Failed to export report');
+            }
+
+            // Trigger download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `report_${periode}_${paymentType}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Gagal mengekspor laporan');
+        }
+    });
+
+    // Handle close preview
+    closePreview?.addEventListener('click', function() {
+        printPreview.classList.add('hidden');
+    });
+
+    // Close preview when clicking outside
+    printPreview?.addEventListener('click', function(e) {
+        if (e.target === printPreview) {
+            printPreview.classList.add('hidden');
+        }
+    });
+
+    // Handle print media query
+    const mediaQueryList = window.matchMedia('print');
+    mediaQueryList.addListener(function(mql) {
+        if (!mql.matches) {
+            // After print dialog is closed
+            printPreview.classList.add('hidden');
+        }
+    });
+});
+</script>
+
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #previewContent, #previewContent * {
+        visibility: visible;
+    }
+    #previewContent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
