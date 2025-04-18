@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Master Barang{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Form Master Barang</h1>
+        <div class="flex gap-2">
+            <button name="baru" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Baru</button>
+            <button name="ubah" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded">Ubah</button>
+            <button name="hapus" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Hapus</button>
+            <button name="simpan" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Simpan</button>
+            <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form id="itemForm" class="grid grid-cols-2 gap-6 mb-6">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kode Barang</label>
+                <input type="text" name="kode" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Barang</label>
+                <input type="text" name="nama" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
+                <input type="text" name="satuan" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Stok Awal</label>
+                <input type="number" name="stok" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Harga Beli</label>
+                <input type="number" name="harga_beli" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Margin (%)</label>
+                <input type="number" name="margin" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Harga Jual</label>
+                <input type="number" name="harga_jual" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
+            </div>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-blue-600 text-white">
+                <tr>
+                    <th class="px-4 py-2 text-left">Kode</th>
+                    <th class="px-4 py-2 text-left">Nama Barang</th>
+                    <th class="px-4 py-2 text-right">Harga Beli</th>
+                    <th class="px-4 py-2 text-right">Harga</th>
+                    <th class="px-4 py-2 text-center">Satuan</th>
+                    <th class="px-4 py-2 text-right">Jumlah</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for item in items %}
+                <tr class="hover:bg-gray-50 cursor-pointer" data-item="{{ item|tojson }}">
+                    <td class="px-4 py-2">{{ item.kode }}</td>
+                    <td class="px-4 py-2">{{ item.nama }}</td>
+                    <td class="px-4 py-2 text-right">{{ "{:,.0f}".format(item.harga_beli) }}</td>
+                    <td class="px-4 py-2 text-right">{{ "{:,.0f}".format(item.harga_jual) }}</td>
+                    <td class="px-4 py-2 text-center">{{ item.satuan }}</td>
+                    <td class="px-4 py-2 text-right">{{ item.stok }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Record Navigation -->
+    <div class="flex justify-end items-center gap-2 mt-4">
+        <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+        <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+        <span class="text-sm">1 of {{ items|length }}</span>
+        <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+        <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+        <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+        <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('itemForm');
+    const hargaBeliInput = form.querySelector('input[name="harga_beli"]');
+    const marginInput = form.querySelector('input[name="margin"]');
+    const hargaJualInput = form.querySelector('input[name="harga_jual"]');
+
+    // Calculate selling price when purchase price or margin changes
+    [hargaBeliInput, marginInput].forEach(input => {
+        input?.addEventListener('input', function() {
+            const hargaBeli = parseFloat(hargaBeliInput.value) || 0;
+            const margin = parseFloat(marginInput.value) || 0;
+            const hargaJual = hargaBeli * (1 + margin/100);
+            hargaJualInput.value = Math.round(hargaJual);
+        });
+    });
+
+    // Handle row click to populate form
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            const item = JSON.parse(this.dataset.item);
+            
+            // Populate form fields
+            form.querySelector('input[name="kode"]').value = item.kode;
+            form.querySelector('input[name="nama"]').value = item.nama;
+            form.querySelector('input[name="satuan"]').value = item.satuan;
+            form.querySelector('input[name="stok"]').value = item.stok;
+            form.querySelector('input[name="harga_beli"]').value = item.harga_beli;
+            form.querySelector('input[name="harga_jual"]').value = item.harga_jual;
+            
+            // Calculate margin
+            const margin = ((item.harga_jual / item.harga_beli) - 1) * 100;
+            form.querySelector('input[name="margin"]').value = margin.toFixed(2);
+        });
+    });
+
+    // Handle "Baru" button click
+    document.querySelector('button[name="baru"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        form.reset();
+    });
+
+    // Handle form submission
+    document.querySelector('button[name="simpan"]')?.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            kode: form.querySelector('input[name="kode"]').value,
+            nama: form.querySelector('input[name="nama"]').value,
+            satuan: form.querySelector('input[name="satuan"]').value,
+            stok: parseInt(form.querySelector('input[name="stok"]').value) || 0,
+            harga_beli: parseFloat(form.querySelector('input[name="harga_beli"]').value) || 0,
+            harga_jual: parseFloat(form.querySelector('input[name="harga_jual"]').value) || 0
+        };
+
+        // Validate required fields
+        if (!formData.kode || !formData.nama || !formData.satuan) {
+            alert('Kode, nama, dan satuan harus diisi');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal menyimpan data');
+            }
+
+            alert('Data berhasil disimpan');
+            window.location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Gagal menyimpan data');
+        }
+    });
+
+    // Handle delete button click
+    document.querySelector('button[name="hapus"]')?.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        const kode = form.querySelector('input[name="kode"]').value;
+        if (!kode) {
+            alert('Pilih barang yang akan dihapus');
+            return;
+        }
+
+        if (!confirm('Yakin ingin menghapus barang ini?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/items/${kode}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal menghapus data');
+            }
+
+            alert('Data berhasil dihapus');
+            window.location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Gagal menghapus data');
+        }
+    });
+});
+</script>
+{% endblock %}
