@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Periode{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">PERIODE</h1>
+        <div class="flex gap-2">
+            <button onclick="setPeriode()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                Set Periode
+            </button>
+        </div>
+    </div>
+
+    <!-- Period Form -->
+    <div class="grid grid-cols-1 gap-4 mb-6 max-w-md">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">PeriodeID</label>
+            <input type="text" id="periodeId" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50" readonly>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+            <input type="text" id="periode" class="w-full border border-gray-300 rounded-md px-3 py-2">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Awal</label>
+            <input type="date" id="awal" class="w-full border border-gray-300 rounded-md px-3 py-2">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Akhir</label>
+            <input type="date" id="akhir" class="w-full border border-gray-300 rounded-md px-3 py-2">
+        </div>
+    </div>
+
+    <!-- Periods Table -->
+    <div class="overflow-x-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">PeriodeID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Awal</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Akhir</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="periodsTable">
+                {% for period in periods %}
+                <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectPeriod('{{ period.periode_id }}')">
+                    <td class="px-4 py-2">{{ period.periode_id }}</td>
+                    <td class="px-4 py-2">{{ period.periode }}</td>
+                    <td class="px-4 py-2">{{ period.awal.strftime('%d/%m/%Y') if period.awal }}</td>
+                    <td class="px-4 py-2">{{ period.akhir.strftime('%d/%m/%Y') if period.akhir }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Record Navigation -->
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium">Record:</span>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+            <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+            <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Function to select period and populate form
+async function selectPeriod(periodeId) {
+    try {
+        const response = await fetch(`/api/periods/${periodeId}`);
+        const period = await response.json();
+        
+        // Populate form fields
+        document.getElementById('periodeId').value = period.periode_id;
+        document.getElementById('periode').value = period.periode;
+        document.getElementById('awal').value = period.awal;
+        document.getElementById('akhir').value = period.akhir;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Function to save period data
+async function setPeriode() {
+    const formData = {
+        periode_id: document.getElementById('periodeId').value,
+        periode: document.getElementById('periode').value,
+        awal: document.getElementById('awal').value,
+        akhir: document.getElementById('akhir').value
+    };
+
+    try {
+        const response = await fetch('/api/periods', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save period data');
+        }
+
+        window.location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving period data');
+    }
+}
+
+// Generate new period ID when creating new period
+function generatePeriodeId() {
+    const date = new Date();
+    const year = date.getFullYear().toString().substr(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return year + month;
+}
+
+// Add event listener for new period creation
+document.addEventListener('DOMContentLoaded', function() {
+    if (!document.getElementById('periodeId').value) {
+        document.getElementById('periodeId').value = generatePeriodeId();
+    }
+});
+</script>
+{% endblock %}
