@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ table_name }} - Simkopkar Database Manager{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Table Header -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-table text-blue-500 mr-2"></i>
+                    {{ table_name }}
+                </h1>
+                <p class="text-gray-600">
+                    Manage records in the {{ table_name }} table
+                </p>
+            </div>
+            <a href="{{ url_for('add_record', table_name=table_name) }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>
+                Add New Record
+            </a>
+        </div>
+    </div>
+
+    <!-- Table Content -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        {% if rows %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        {% for column in columns %}
+                        <th scope="col" 
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ column }}
+                        </th>
+                        {% endfor %}
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for row in rows %}
+                    <tr class="hover:bg-gray-50">
+                        {% for column in columns %}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ row[column] if row[column] is not none else '' }}
+                        </td>
+                        {% endfor %}
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            {% set id_value = row.get('ID') or row.get('id') or row.get('Id') %}
+                            {% if id_value is not none %}
+                                <a href="{{ url_for('edit_record', table_name=table_name, id=id_value) }}" 
+                                   class="text-blue-600 hover:text-blue-900 mr-3">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </a>
+                                <a href="{{ url_for('delete_record', table_name=table_name, id=id_value) }}" 
+                                   class="text-red-600 hover:text-red-900"
+                                   onclick="return confirm('Are you sure you want to delete this record?');">
+                                    <i class="fas fa-trash-alt"></i>
+                                    Delete
+                                </a>
+                            {% else %}
+                                <span class="text-gray-400">No ID field</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <i class="fas fa-folder-open text-gray-400 text-4xl mb-3"></i>
+            <p class="text-gray-600">No records found in this table.</p>
+            <a href="{{ url_for('add_record', table_name=table_name) }}" 
+               class="inline-flex items-center px-4 py-2 mt-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>
+                Add First Record
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Table Information -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+            Table Information
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-medium text-gray-900 mb-2">Columns</h3>
+                <p class="text-sm text-gray-600">{{ columns|length }} columns</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-medium text-gray-900 mb-2">Records</h3>
+                <p class="text-sm text-gray-600">{{ rows|length if rows else 0 }} records</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-medium text-gray-900 mb-2">Last Updated</h3>
+                <p class="text-sm text-gray-600">{{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-end">
+        <a href="{{ url_for('dashboard') }}" 
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
