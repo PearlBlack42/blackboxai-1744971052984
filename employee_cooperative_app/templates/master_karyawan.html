@@ -150,19 +150,19 @@ async function selectEmployee(nik) {
         const emp = await response.json();
         
         // Populate form fields
-        document.getElementById('nik').value = emp.nik;
-        document.getElementById('nama').value = emp.nama;
-        document.getElementById('bagian').value = emp.bagian;
-        document.getElementById('jabatan').value = emp.jabatan;
-        document.getElementById('jk').value = emp.jk;
-        document.getElementById('khusus').checked = emp.khusus;
-        document.getElementById('tmk').value = emp.tmk;
-        document.getElementById('iuranWajib').value = emp.iuran_wajib;
+        document.getElementById('nik').value = emp.nik || '';
+        document.getElementById('nama').value = emp.nama || '';
+        document.getElementById('bagian').value = emp.bagian || '';
+        document.getElementById('jabatan').value = emp.jabatan || '';
+        document.getElementById('jk').value = emp.jk || '';
+        document.getElementById('khusus').checked = emp.khusus || false;
+        document.getElementById('tmk').value = emp.tmk || '';
+        document.getElementById('iuranWajib').value = emp.iuran_wajib || '';
         document.getElementById('tglKeluar').value = emp.tgl_keluar || '';
-        document.getElementById('baru').checked = emp.baru;
+        document.getElementById('baru').checked = emp.baru || false;
         document.getElementById('status').value = emp.status ? 'Aktif' : 'Nonaktif';
-        document.getElementById('maxPlafon').value = emp.max_plafon;
-        document.getElementById('maxPlafonSembako').value = emp.max_plafon_sembako;
+        document.getElementById('maxPlafon').value = emp.max_plafon || '';
+        document.getElementById('maxPlafonSembako').value = emp.max_plafon_sembako || '';
     } catch (error) {
         console.error('Error:', error);
     }
