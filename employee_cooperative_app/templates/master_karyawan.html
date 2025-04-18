@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Master Karyawan{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">MASTER KARYAWAN</h1>
+    </div>
+
+    <!-- Employee Form -->
+    <div class="grid grid-cols-2 gap-8 mb-6">
+        <!-- Left Column -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+                <input type="text" id="nik" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                <input type="text" id="nama" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Bagian</label>
+                <input type="text" id="bagian" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan</label>
+                <input type="text" id="jabatan" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">JK</label>
+                <select id="jk" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    <option value="L">L</option>
+                    <option value="P">P</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="khusus" class="rounded border-gray-300">
+                <label class="text-sm font-medium text-gray-700">Khusus</label>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">TMK</label>
+                <input type="date" id="tmk" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Iuran/Wajib</label>
+                <input type="number" id="iuranWajib" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tgl Keluar</label>
+                <input type="date" id="tglKeluar" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="baru" class="rounded border-gray-300">
+                <label class="text-sm font-medium text-gray-700">Baru</label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="status" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    <option value="Aktif">Aktif</option>
+                    <option value="Nonaktif">Nonaktif</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Max Plafon</label>
+                <input type="number" id="maxPlafon" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Max Plafon Sembako</label>
+                <input type="number" id="maxPlafonSembako" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+        </div>
+    </div>
+
+    <!-- Employees Table -->
+    <div class="overflow-x-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIK</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bagian</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jabatan</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">JK</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">TMK</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Iuran</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">TglKe</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Baru</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Khusus</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">MaxPlafon</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">MaxPlafons</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="employeesTable">
+                {% for emp in employees %}
+                <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectEmployee('{{ emp.nik }}')">
+                    <td class="px-4 py-2">{{ emp.nik }}</td>
+                    <td class="px-4 py-2">{{ emp.nama }}</td>
+                    <td class="px-4 py-2">{{ emp.bagian }}</td>
+                    <td class="px-4 py-2">{{ emp.jabatan }}</td>
+                    <td class="px-4 py-2 text-center">{{ emp.jk }}</td>
+                    <td class="px-4 py-2 text-center">{{ emp.tmk.strftime('%d/%m/%Y') if emp.tmk }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.0f}".format(emp.iuran_wajib) }}</td>
+                    <td class="px-4 py-2 text-center">{{ emp.tgl_keluar.strftime('%d/%m/%Y') if emp.tgl_keluar }}</td>
+                    <td class="px-4 py-2 text-center">
+                        <i class="fas fa-check text-green-600" {% if not emp.baru %}style="display:none"{% endif %}></i>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        <i class="fas fa-check text-green-600" {% if not emp.status %}style="display:none"{% endif %}></i>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        <i class="fas fa-check text-green-600" {% if not emp.khusus %}style="display:none"{% endif %}></i>
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.0f}".format(emp.max_plafon) }}</td>
+                    <td class="px-4 py-2 text-right font-mono">{{ "{:,.0f}".format(emp.max_plafon_sembako) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Record Navigation -->
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium">Record:</span>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+            <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+            <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Function to select employee and populate form
+async function selectEmployee(nik) {
+    try {
+        const response = await fetch(`/api/employees/${nik}`);
+        const emp = await response.json();
+        
+        // Populate form fields
+        document.getElementById('nik').value = emp.nik;
+        document.getElementById('nama').value = emp.nama;
+        document.getElementById('bagian').value = emp.bagian;
+        document.getElementById('jabatan').value = emp.jabatan;
+        document.getElementById('jk').value = emp.jk;
+        document.getElementById('khusus').checked = emp.khusus;
+        document.getElementById('tmk').value = emp.tmk;
+        document.getElementById('iuranWajib').value = emp.iuran_wajib;
+        document.getElementById('tglKeluar').value = emp.tgl_keluar || '';
+        document.getElementById('baru').checked = emp.baru;
+        document.getElementById('status').value = emp.status ? 'Aktif' : 'Nonaktif';
+        document.getElementById('maxPlafon').value = emp.max_plafon;
+        document.getElementById('maxPlafonSembako').value = emp.max_plafon_sembako;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Function to save employee data
+async function saveEmployee() {
+    const formData = {
+        nik: document.getElementById('nik').value,
+        nama: document.getElementById('nama').value,
+        bagian: document.getElementById('bagian').value,
+        jabatan: document.getElementById('jabatan').value,
+        jk: document.getElementById('jk').value,
+        khusus: document.getElementById('khusus').checked,
+        tmk: document.getElementById('tmk').value,
+        iuran_wajib: parseFloat(document.getElementById('iuranWajib').value),
+        tgl_keluar: document.getElementById('tglKeluar').value || null,
+        baru: document.getElementById('baru').checked,
+        status: document.getElementById('status').value === 'Aktif',
+        max_plafon: parseFloat(document.getElementById('maxPlafon').value),
+        max_plafon_sembako: parseFloat(document.getElementById('maxPlafonSembako').value)
+    };
+
+    try {
+        const response = await fetch('/api/employees', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save employee data');
+        }
+
+        window.location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving employee data');
+    }
+}
+
+// Add event listeners
+document.getElementById('nik').addEventListener('change', async function() {
+    if (this.value) {
+        await selectEmployee(this.value);
+    }
+});
+</script>
+{% endblock %}
