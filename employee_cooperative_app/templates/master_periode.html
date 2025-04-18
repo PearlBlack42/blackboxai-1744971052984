@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Periode - Koperasi Karyawan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .table-fixed {
+            table-layout: fixed;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+    <div class="max-w-7xl mx-auto bg-white rounded shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Periode</h2>
+        <div class="flex space-x-2 mb-4">
+            <button class="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded font-semibold">Set Periode</button>
+        </div>
+        <form class="grid grid-cols-4 gap-4 mb-4">
+            <div>
+                <label class="block font-semibold mb-1">PeriodeID</label>
+                <input type="text" name="periode_id" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Periode</label>
+                <input type="text" name="periode" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Awal</label>
+                <input type="date" name="awal" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Akhir</label>
+                <input type="date" name="akhir" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+        </form>
+        <div class="overflow-x-auto">
+            <table class="table-fixed border border-gray-300 w-full text-sm">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-2 py-1 w-32">PeriodeID</th>
+                        <th class="border border-gray-300 px-2 py-1">Periode</th>
+                        <th class="border border-gray-300 px-2 py-1 w-32">Awal</th>
+                        <th class="border border-gray-300 px-2 py-1 w-32">Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data rows go here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
