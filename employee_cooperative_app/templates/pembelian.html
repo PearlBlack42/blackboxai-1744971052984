@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Form Transaksi Pembelian{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">FORM TRANSAKSI PEMBELIAN</h1>
+        <div class="flex gap-2">
+            <button name="baru" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Baru</button>
+            <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded">Ubah</button>
+            <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Hapus</button>
+            <button name="simpan" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Simpan</button>
+            <button class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">Cetak</button>
+            <button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    <!-- Transaction Info -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+                <select id="periode" name="periode" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    <option value="">Pilih Periode</option>
+                    {% for period in periods %}
+                    <option value="{{ period.periode_id }}">{{ period.periode }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">No. Faktur</label>
+                <input type="text" id="faktur" name="faktur" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                <input type="date" id="tanggal" name="tanggal" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                <select name="supplier" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    <option value="">Pilih Supplier</option>
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.nama }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                <input type="text" name="alamat" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
+                <input type="text" name="telepon" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
+                <textarea name="keterangan" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Jam</label>
+                <input type="text" name="jam" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="overflow-x-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-blue-600 text-white">
+                <tr>
+                    <th class="px-4 py-2 text-left">Kode</th>
+                    <th class="px-4 py-2 text-left">Nama Barang</th>
+                    <th class="px-4 py-2 text-right">Harga</th>
+                    <th class="px-4 py-2 text-right">Qty</th>
+                    <th class="px-4 py-2 text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">
+                        <select name="kode_barang" class="w-full border-0 bg-transparent focus:ring-0">
+                            <option value="">Pilih barang...</option>
+                            {% for item in items %}
+                            <option value="{{ item.kode }}" data-nama="{{ item.nama }}" data-harga="{{ item.harga_beli }}">
+                                {{ item.kode }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="px-4 py-2">
+                        <input type="text" name="nama_barang" readonly class="w-full border-0 bg-transparent focus:ring-0">
+                    </td>
+                    <td class="px-4 py-2 text-right">
+                        <input type="text" name="harga" class="w-full border-0 bg-transparent text-right focus:ring-0">
+                    </td>
+                    <td class="px-4 py-2 text-right">
+                        <input type="number" name="qty" min="1" class="w-20 border-0 bg-transparent text-right focus:ring-0">
+                    </td>
+                    <td class="px-4 py-2 text-right">
+                        <input type="text" name="total" readonly class="w-full border-0 bg-transparent text-right focus:ring-0">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="flex justify-between items-center">
+        <div class="flex gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Grand Total</label>
+                <input type="text" name="grandTotal" readonly class="w-40 border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-right">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">PPN (%)</label>
+                <input type="number" name="ppn" value="11" min="0" max="100" class="w-20 border border-gray-300 rounded-md px-3 py-2 text-right">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total + PPN</label>
+                <input type="text" name="totalPpn" readonly class="w-40 border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-right">
+            </div>
+        </div>
+
+        <!-- Record Navigation -->
+        <div class="flex items-center gap-2">
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-backward"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>
+            <span class="text-sm">1 of 1</span>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>
+            <button class="px-2 py-1 border rounded hover:bg-gray-100"><i class="fas fa-step-forward"></i></button>
+            <div class="border rounded px-2 py-1 bg-gray-50">No Filter</div>
+            <input type="text" placeholder="Search" class="border rounded px-2 py-1 w-32">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date to today
+    document.getElementById('tanggal').valueAsDate = new Date();
+    
+    // Update time every second
+    function updateTime() {
+        const now = new Date();
+        document.querySelector('input[name="jam"]').value = now.toLocaleTimeString('id-ID');
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // Generate invoice number when period changes
+    const periodeSelect = document.getElementById('periode');
+    periodeSelect?.addEventListener('change', async function() {
+        try {
+            const response = await fetch(`/api/purchases/next-invoice/${this.value}`);
+            const data = await response.json();
+            document.getElementById('faktur').value = data.invoice_number;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // Auto-populate supplier details when selected
+    const supplierSelect = document.querySelector('select[name="supplier"]');
+    supplierSelect?.addEventListener('change', async function() {
+        try {
+            const response = await fetch(`/api/suppliers/${this.value}`);
+            const supplier = await response.json();
+            
+            document.querySelector('input[name="alamat"]').value = supplier.alamat;
+            document.querySelector('input[name="telepon"]').value = supplier.telepon;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // Helper function to add event listeners to a row
+    function addRowEventListeners(row) {
+        const itemSelect = row.querySelector('select[name="kode_barang"]');
+        const qtyInput = row.querySelector('input[name="qty"]');
+        const hargaInput = row.querySelector('input[name="harga"]');
+
+        itemSelect?.addEventListener('change', function() {
+            if (!this.value) {
+                row.querySelector('input[name="nama_barang"]').value = '';
+                row.querySelector('input[name="harga"]').value = '';
+                row.querySelector('input[name="qty"]').value = '';
+                row.querySelector('input[name="total"]').value = '';
+                calculateTotals();
+                return;
+            }
+
+            const selectedOption = this.options[this.selectedIndex];
+            const nama = selectedOption.dataset.nama;
+            const harga = parseFloat(selectedOption.dataset.harga);
+            
+            row.querySelector('input[name="nama_barang"]').value = nama;
+            row.querySelector('input[name="harga"]').value = harga.toLocaleString();
+            row.querySelector('input[name="qty"]').value = '1';
+            
+            // Calculate initial total
+            const qty = 1;
+            const total = qty * harga;
+            row.querySelector('input[name="total"]').value = total.toLocaleString();
+            calculateTotals();
+        });
+
+        [qtyInput, hargaInput].forEach(input => {
+            input?.addEventListener('input', function() {
+                const qty = parseFloat(qtyInput.value) || 0;
+                const harga = parseFloat(hargaInput.value.replace(/,/g, '')) || 0;
+                const total = qty * harga;
+                row.querySelector('input[name="total"]').value = total.toLocaleString();
+                calculateTotals();
+            });
+        });
+    }
+
+    // Function to reset form
+    function resetForm() {
+        // Reset dropdowns
+        document.getElementById('periode').value = '';
+        document.querySelector('select[name="supplier"]').value = '';
+
+        // Reset text inputs
+        document.querySelector('input[name="alamat"]').value = '';
+        document.querySelector('input[name="telepon"]').value = '';
+        document.querySelector('input[name="keterangan"]').value = '';
+        document.querySelector('input[name="grandTotal"]').value = '';
+        document.querySelector('input[name="totalPpn"]').value = '';
+        document.getElementById('faktur').value = '';
+
+        // Reset table
+        const tbody = document.querySelector('tbody');
+        while (tbody.children.length > 1) {
+            tbody.removeChild(tbody.lastChild);
+        }
+        const firstRow = tbody.firstElementChild;
+        firstRow.querySelector('select[name="kode_barang"]').value = '';
+        firstRow.querySelector('input[name="nama_barang"]').value = '';
+        firstRow.querySelector('input[name="harga"]').value = '';
+        firstRow.querySelector('input[name="qty"]').value = '';
+        firstRow.querySelector('input[name="total"]').value = '';
+
+        // Set default date to today
+        document.getElementById('tanggal').valueAsDate = new Date();
+    }
+
+    // Add event listeners to initial row
+    addRowEventListeners(document.querySelector('tbody tr'));
+
+    // Handle "Baru" button click
+    document.querySelector('button[name="baru"]')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetForm();
+    });
+
+    // Add new row when last row is filled
+    document.querySelector('tbody')?.addEventListener('change', function(e) {
+        if (e.target.matches('select[name="kode_barang"]')) {
+            const row = e.target.closest('tr');
+            if (row === this.lastElementChild && e.target.value) {
+                const newRow = row.cloneNode(true);
+                // Clear values in new row
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelector('select').value = '';
+                this.appendChild(newRow);
+                
+                // Add event listeners to new row
+                addRowEventListeners(newRow);
+            }
+        }
+    });
+
+    // Calculate PPN when rate changes
+    document.querySelector('input[name="ppn"]')?.addEventListener('input', calculateTotals);
+
+    // Helper function to calculate totals
+    function calculateTotals() {
+        const totals = Array.from(document.querySelectorAll('input[name="total"]'))
+            .map(input => parseFloat(input.value.replace(/,/g, '')) || 0);
+        const grandTotal = totals.reduce((sum, total) => sum + total, 0);
+        document.querySelector('input[name="grandTotal"]').value = grandTotal.toLocaleString();
+
+        // Calculate PPN
+        const ppnRate = parseFloat(document.querySelector('input[name="ppn"]').value) || 0;
+        const ppnAmount = grandTotal * (ppnRate / 100);
+        const totalPpn = grandTotal + ppnAmount;
+        document.querySelector('input[name="totalPpn"]').value = totalPpn.toLocaleString();
+    }
+
+    // Handle form submission
+    document.querySelector('button[name="simpan"]')?.addEventListener('click', async function() {
+        try {
+            const formData = {
+                faktur: document.getElementById('faktur').value,
+                tanggal: document.getElementById('tanggal').value,
+                supplier_id: document.querySelector('select[name="supplier"]').value,
+                periode_id: document.getElementById('periode').value,
+                keterangan: document.querySelector('textarea[name="keterangan"]').value,
+                ppn: parseFloat(document.querySelector('input[name="ppn"]').value) || 0,
+                total: parseFloat(document.querySelector('input[name="grandTotal"]').value.replace(/,/g, '')),
+                total_ppn: parseFloat(document.querySelector('input[name="totalPpn"]').value.replace(/,/g, '')),
+                items: []
+            };
+
+            // Get items from table
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const kodeBarang = row.querySelector('select[name="kode_barang"]').value;
+                if (kodeBarang) {
+                    formData.items.push({
+                        kode_barang: kodeBarang,
+                        harga: parseFloat(row.querySelector('input[name="harga"]').value.replace(/,/g, '')),
+                        qty: parseInt(row.querySelector('input[name="qty"]').value),
+                        total: parseFloat(row.querySelector('input[name="total"]').value.replace(/,/g, ''))
+                    });
+                }
+            });
+
+            if (formData.items.length === 0) {
+                alert('Pilih minimal satu barang');
+                return;
+            }
+
+            if (!formData.supplier_id) {
+                alert('Pilih supplier');
+                return;
+            }
+
+            if (!formData.periode_id) {
+                alert('Pilih periode');
+                return;
+            }
+
+            const response = await fetch('/api/purchases', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal menyimpan pembelian');
+            }
+
+            alert('Pembelian berhasil disimpan');
+            resetForm();
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Gagal menyimpan pembelian');
+        }
+    });
+});
+</script>
+{% endblock %}
