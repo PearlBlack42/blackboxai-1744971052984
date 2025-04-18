@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Form Transaksi - Koperasi Karyawan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .table-fixed {
+            table-layout: fixed;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+    <div class="max-w-7xl mx-auto bg-white rounded shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Form Transaksi</h2>
+        <form class="mb-4 grid grid-cols-4 gap-4 items-end">
+            <div>
+                <label class="block font-semibold mb-1">Periode</label>
+                <select class="w-full border border-gray-300 rounded px-2 py-1">
+                    <option>APRIL 2025</option>
+                    <option>MEI 2025</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Faktur</label>
+                <input type="text" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">NIK</label>
+                <input type="text" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Nama</label>
+                <input type="text" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Jabatan</label>
+                <input type="text" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Plafon</label>
+                <input type="number" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Sisa</label>
+                <input type="number" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Tagihan</label>
+                <input type="text" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Tgl</label>
+                <input type="date" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Jam</label>
+                <input type="time" class="w-full border border-gray-300 rounded px-2 py-1" />
+            </div>
+        </form>
+        <div class="overflow-x-auto mb-4">
+            <table class="table-fixed border border-gray-300 w-full text-sm">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-2 py-1 w-32">Kode</th>
+                        <th class="border border-gray-300 px-2 py-1">Nama Barang</th>
+                        <th class="border border-gray-300 px-2 py-1 w-32">Harga</th>
+                        <th class="border border-gray-300 px-2 py-1 w-20">Qty</th>
+                        <th class="border border-gray-300 px-2 py-1 w-40">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data rows go here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="grid grid-cols-3 gap-4 font-semibold">
+            <div>Grand Total: <span class="text-red-600">#Type!</span></div>
+            <div>Kembali: <span class="text-red-600">#Type!</span></div>
+            <div>Bayar: <span class="text-red-600">#Type!</span></div>
+        </div>
+    </div>
+</body>
+</html>
