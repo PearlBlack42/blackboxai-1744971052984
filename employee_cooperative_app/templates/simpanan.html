@@ -164,8 +164,8 @@
 
 {% block extra_js %}
 <script>
-async function updateEmployeeInfo() {
-    const nik = document.getElementById('nik').value;
+document.getElementById('nik').addEventListener('change', async function() {
+    const nik = this.value;
     if (!nik) {
         document.getElementById('nama').value = '';
         document.getElementById('bagian').value = '';
@@ -175,18 +175,24 @@ async function updateEmployeeInfo() {
 
     try {
         const response = await fetch(`/api/employees/${nik}`);
+        if (!response.ok) {
+            throw new Error('Employee not found');
+        }
         const employee = await response.json();
         
-        document.getElementById('nama').value = employee.nama;
-        document.getElementById('bagian').value = employee.bagian;
-        document.getElementById('jabatan').value = employee.jabatan;
+        document.getElementById('nama').value = employee.nama || '';
+        document.getElementById('bagian').value = employee.bagian || '';
+        document.getElementById('jabatan').value = employee.jabatan || '';
         
         // Load transactions
         loadTransactions(nik);
     } catch (error) {
         console.error('Error:', error);
+        document.getElementById('nama').value = '';
+        document.getElementById('bagian').value = '';
+        document.getElementById('jabatan').value = '';
     }
-}
+});
 
 async function loadTransactions(nik) {
     try {
