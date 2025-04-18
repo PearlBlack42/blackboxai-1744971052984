@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Simkopkar Database Manager{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Welcome Section -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-tachometer-alt text-blue-500 mr-2"></i>
+            Welcome to Simkopkar Database Manager
+        </h1>
+        <p class="text-gray-600">
+            Select a table from below to view, add, edit, or delete records.
+        </p>
+    </div>
+
+    <!-- Database Tables Section -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">
+            <i class="fas fa-table text-blue-500 mr-2"></i>
+            Available Tables
+        </h2>
+
+        {% if tables %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for table in tables %}
+            <a href="{{ url_for('view_table', table_name=table) }}" 
+               class="block p-6 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition duration-150">
+                <div class="flex items-center">
+                    <i class="fas fa-database text-blue-500 mr-3"></i>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">{{ table }}</h3>
+                        <p class="text-sm text-gray-600">Click to manage records</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <i class="fas fa-exclamation-circle text-yellow-500 text-4xl mb-3"></i>
+            <p class="text-gray-600">No tables found in the database.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Connected User -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100">
+                    <i class="fas fa-user text-blue-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Connected As</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ session.user_id }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Status -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Database Status</p>
+                    <p class="text-lg font-semibold text-gray-900">Connected</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Count -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100">
+                    <i class="fas fa-table text-purple-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Tables</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ tables|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">
+            <i class="fas fa-question-circle text-blue-500 mr-2"></i>
+            Quick Help
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-medium text-gray-900 mb-2">
+                    <i class="fas fa-eye text-blue-500 mr-2"></i>
+                    View Records
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Click on any table name to view its records
+                </p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-medium text-gray-900 mb-2">
+                    <i class="fas fa-plus text-green-500 mr-2"></i>
+                    Add Records
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Use the "Add New" button when viewing a table
+                </p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-medium text-gray-900 mb-2">
+                    <i class="fas fa-edit text-yellow-500 mr-2"></i>
+                    Edit Records
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Click the edit icon next to any record to modify it
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
