@@ -1,0 +1,45 @@
+<div class="p-6">
+    <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold">Laporan Pembelian</h1>
+        <h2 class="text-xl">Periode: {{ period }}</h2>
+    </div>
+
+    <table class="w-full border-collapse border border-gray-300 mb-6">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border border-gray-300 px-4 py-2">Tanggal</th>
+                <th class="border border-gray-300 px-4 py-2">No. Faktur</th>
+                <th class="border border-gray-300 px-4 py-2">Supplier</th>
+                <th class="border border-gray-300 px-4 py-2">Items</th>
+                <th class="border border-gray-300 px-4 py-2 text-right">Total</th>
+                <th class="border border-gray-300 px-4 py-2 text-right">PPN</th>
+                <th class="border border-gray-300 px-4 py-2 text-right">Total + PPN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td class="border border-gray-300 px-4 py-2">{{ row.tanggal }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ row.faktur }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ row.supplier }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ row.items }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-right">{{ "{:,.0f}".format(row.total) }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-right">{{ "{:,.0f}".format(row.ppn) }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-right">{{ "{:,.0f}".format(row.total_ppn) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="bg-gray-100 font-bold">
+                <td class="border border-gray-300 px-4 py-2" colspan="4">Total</td>
+                <td class="border border-gray-300 px-4 py-2 text-right">{{ "{:,.0f}".format(total) }}</td>
+                <td class="border border-gray-300 px-4 py-2" colspan="1"></td>
+                <td class="border border-gray-300 px-4 py-2 text-right">{{ "{:,.0f}".format(total_ppn) }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="text-sm text-gray-600">
+        <p>Dicetak pada: {{ now.strftime('%d/%m/%Y %H:%M:%S') }}</p>
+    </div>
+</div>
